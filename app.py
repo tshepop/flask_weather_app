@@ -3,6 +3,8 @@ from flask import Flask, render_template
 
 app = Flask(__name__)
 
+API_URL = "https://api.openweathermap.org/data/2.5/forecast?q={}&units=metric&cnt=5&appid={}"
+
 capitals = [
     "Ascension and Tristan da Cunha", "Abu Dhabi", "Abuja", "Accra",
     "Adamstown", "Addis Ababa", "Algiers", "Alofi", "Amman", "Amsterdam",

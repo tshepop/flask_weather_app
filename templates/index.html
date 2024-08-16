@@ -9,13 +9,15 @@
 
 <body>
     <h1>My Weather</h1>
-    <form action="">
-        <select name="" id="">
+
+    <form action="{{ url_for('get_weather') }}" method="post">
+        <select name="city_name" id="">
+            <option value="">Choose an option below...</option>
             {% for city in capital_city %}
             <option value="{{ city }}">{{ city }}</option>
             {% endfor %}
         </select>
-        <button>Get Weather</button>
+        <input type="submit" value="Get Weather">
     </form>
 
 </body>

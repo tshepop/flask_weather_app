@@ -38,13 +38,37 @@ def home():
 
 @app.route("/get_weather", methods=("GET", "POST"))
 def get_weather():
+    """
+    Handles HTTP requests to the "/get_weather" URL of the web application.
+
+    If the request method is a POST, it retrieves the city name from the
+    form input and submits a GET request to the OpenWeatherMap API.
+
+    The API response is printed to the console using the pprint module.
+
+    The function then renders the "weather.html" template and passes the API
+    response as a variable named "results".
+
+    Parameters:
+        None
+
+    Returns:
+        A rendered HTML template
+    """
 
     if request.method == "POST":
+        # Get the city name from the form input
         city = request.form["city_name"]
 
+        # Submit a GET request to the OpenWeatherMap API
         data = requests.get(API_URL.format(city, API_KEY))
+
+        # Get the API response in JSON format
         resp = data.json()
+
+        # Print the API response to the console
         pprint.pprint(resp)
 
+    # Render the "weather.html" template with the API response as a variable
     return render_template("weather.html",
                            results=resp)

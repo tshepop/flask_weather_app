@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 import requests
 import pprint
+
 import arrow
 
 import config
@@ -65,11 +66,40 @@ def get_weather():
         data = requests.get(API_URL.format(city, API_KEY))
 
         # Get the API response in JSON format
-        resp = data.json()
+        response = data.json()
+
+        # extract timezone
+        timezone_offset = response["city"]["timezone"]
+        print(timezone_offset)
+
+        # get utc
+        utc_now = arrow.utcnow()
+        print(utc_now)
+
+        # calculate the time for each chosen city
+        # there are 3600 seconds in 1 hour
+        offset_hours = timezone_offset / 3600
+        # selected capital city local time
+        local_time = utc_now.shift(hours=offset_hours)
+
+        # test if correct time format is displayed
+        if offset_hours > 0:
+            offset_description = f"{int(offset_hours)} hours ahead of UTC"
+        else:
+            offset_description = f"{abs(int(offset_hours))} hours behind UTC"
+
+        print(f"Local Time: {local_time.format('YYYY-MM-DD hh:mm:ss A')}")
+        print(f"Timezone offset: {offset_description}\n")
+
+        # format the time and year, before sending to template
+        current_time = local_time.format('hh:mm A')
+        current_year = local_time.format('YYYY-MM-DD')
 
         # Print the API response to the console
-        pprint.pprint(resp)
+        # pprint.pprint(response)
 
     # Render the "weather.html" template with the API response as a variable
     return render_template("weather.html",
-                           results=resp)
+                           current_time=current_time,
+                           current_year=current_year,
+                           results=response)

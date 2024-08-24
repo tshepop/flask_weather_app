@@ -109,11 +109,9 @@ def get_weather():
 
         # Print the API response to the console
         # pprint.pprint(response)
-        # print(type(response))
 
         # use arrow.get() to get dt from response,
         # get only midday temps for different days
-
         for d_time in response['list']:
             dt_time = d_time['dt']
             get_dt = arrow.get(dt_time)

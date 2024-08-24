@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, flash, render_template, request, redirect, url_for
 import requests
 import pprint
 
@@ -7,6 +7,7 @@ import arrow
 import config
 
 app = Flask(__name__)
+app.secret_key = "00457a6d265b50598cdf363e3c2ace05b5dc512a24a18e530d1ec38b4b4c46dd"
 
 API_KEY = config.API_KEY
 # use string interpolation for url
@@ -38,7 +39,7 @@ def home():
                            capital_city=capitals)
 
 
-@app.route("/get_weather", methods=("GET", "POST"))
+@app.route("/weather", methods=("GET", "POST"))
 def get_weather():
     """
     Handles HTTP requests to the "/get_weather" URL of the web application.
@@ -60,21 +61,32 @@ def get_weather():
 
     if request.method == "POST":
         # Get the city name from the form input
-        city = request.form["city_name"]
+        city = request.form.get("city_name")
 
-        # Submit a GET request to the OpenWeatherMap API
-        data = requests.get(API_URL.format(city, API_KEY))
+        if not city:
+            flash("Please make a valid selection!")
+            return redirect(url_for("home"))
+
+        try:
+            # Submit a GET request to the OpenWeatherMap API
+            data = requests.get(API_URL.format(city, API_KEY))
+            print(data.status_code)
+            data.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching weather data: {e}")
+            flash("Error fetching weather data")
+            return redirect(url_for("home"))
 
         # Get the API response in JSON format
         response = data.json()
 
         # extract timezone
         timezone_offset = response["city"]["timezone"]
-        print(timezone_offset)
+        # print(timezone_offset)
 
         # get utc
         utc_now = arrow.utcnow()
-        print(utc_now)
+        # print(utc_now)
 
         # calculate the time for each chosen city
         # there are 3600 seconds in 1 hour
@@ -93,13 +105,27 @@ def get_weather():
 
         # format the time and year, before sending to template
         current_time = local_time.format('hh:mm A')
-        current_year = local_time.format('YYYY-MM-DD')
+        current_date = local_time.format('YYYY-MM-DD')
 
         # Print the API response to the console
         # pprint.pprint(response)
+        # print(type(response))
+
+        # use arrow.get() to get dt from response,
+        # get only midday temps for different days
+
+        for d_time in response['list']:
+            dt_time = d_time['dt']
+            get_dt = arrow.get(dt_time)
+            sliced_time = str(get_dt).split("T")[1]
+            if sliced_time.startswith("12"):
+                # print(d_time['main']['temp'])
+                midday_temp = d_time['main']['temp']
 
     # Render the "weather.html" template with the API response as a variable
     return render_template("weather.html",
                            current_time=current_time,
-                           current_year=current_year,
-                           results=response)
+                           current_date=current_date,
+                           results=response,
+                           local_time=local_time,
+                           midday_temp=midday_temp)

@@ -7,7 +7,7 @@ import arrow
 import config
 
 app = Flask(__name__)
-app.secret_key = "00457a6d265b50598cdf363e3c2ace05b5dc512a24a18e530d1ec38b4b4c46dd"
+app.secret_key = config.APP_SECRET
 
 API_KEY = config.API_KEY
 # use string interpolation for url

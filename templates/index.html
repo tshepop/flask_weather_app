@@ -24,18 +24,48 @@
             font-weight: 400;
             font-style: normal;
         }
+
+        .button:hover {
+            color: #f39c12;
+        }
+
+        .weather-btn {
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+        }
+
+        .weather-btn:hover {
+            background-color: #0056b3;
+            font-size: 18px;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        {% for message in get_flashed_messages() %}
+        <div class="col-lg-8 col-md-10 mt-5 mx-auto">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="w-100 alert alert-warning alert-dismissible fade show" role="alert">
+                {% for message in messages %}
+                <strong>{{ message}}</strong>
+                {% endfor %}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <!---
+        {# {% for message in get_flashed_messages() %} #}
         <div class="alert alert-warning alert-dismissible fade show mt-4" role="alert">
             <strong>{{ message }}</strong>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        {% endfor %}
-
+        {# {% endfor %} #}
+        -->
         <section class="mx-auto my-5" style="max-width: 23em;">
             <div class="card shadow p-3 mb-5 bg-body rounded">
                 <h1 class="new-amsterdam-regular text-center">My City Weather</h1>
@@ -51,7 +81,7 @@
                             {% endfor %}
                         </select>
                         <div class="d-grid">
-                            <button class="btn btn-primary mt-3" type="submit">Get Weather</button>
+                            <button class="btn weather-btn button mt-3" type="submit">Get Weather</button>
                         </div>
                     </form>
                 </div>
